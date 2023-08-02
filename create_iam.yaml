@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  BucketName:
+    Type: String
+Resources:
+  S3ReadWritePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: S3ReadWritePolicy
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject
+              - s3:PutObject
+            Effect: Allow
+            Resource: !Sub 'arn:aws:s3:::${BucketName}/*'
+          - Action:
+              - s3:ListBucket
+            Effect: Allow
+            Resource: !Sub 'arn:aws:s3:::${BucketName}'
+      Users:
+        - !Ref IAMUser
+  IAMUser:
+    Type: AWS::IAM::User
+  IAMAccessKey:
+    Type: AWS::IAM::AccessKey
+    Properties:
+      UserName: !Ref IAMUser
+Outputs:
+  AccessKey:
+    Value: !Ref IAMAccessKey
+    Description: AWSAccessKeyId of IAM user
+  SecretKey:
+    Value: !GetAtt [IAMAccessKey, SecretAccessKey]
+    Description: AWSSecretAccessKey of IAM user
